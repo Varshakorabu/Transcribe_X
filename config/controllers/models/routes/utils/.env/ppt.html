@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPT Generator - TranscribeX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .generator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 968px) {
+            .generator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section, .preview-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .slides-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slide-count {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .design-templates {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .template-option {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-option:hover {
+            border-color: var(--primary);
+        }
+
+        .template-option.selected {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+
+        .template-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .template-option.selected .template-icon {
+            color: var(--primary);
+        }
+
+        .preview-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .preview-slides {
+            display: none;
+            width: 100%;
+        }
+
+        .slide-preview {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .slide-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .slide-content {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .generate-btn {
+            padding: 15px 30px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .reset-btn {
+            padding: 15px 30px;
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #f8f9fa;
+            border-color: #bbb;
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 20px;
+            margin-top: 70px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--success);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .design-templates {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <i class="fas fa-file-alt"></i>
+                <h1>TranscribeX</h1>
+            </div>
+            
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="ieee-converter.html">IEEE Converter</a>
+                <a href="ppt-generator.html" class="active">PPT Generator</a>
+                <a href="mcq-generator.html">MCQ Generator</a>
+                <a href="summary-creator.html">Summary Creator</a>
+                <a href="#">My Documents</a>
+            </div>
+            
+            <div class="user-actions">
+                <div class="user-profile">
+                    <div class="avatar">JS</div>
+                    <span>John Smith</span>
+                </div>
+                <button class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="page-header">
+            <h2>PPT Generator</h2>
+            <p>Create professional presentations by choosing topic, slides count, and design templates. Perfect for academic and business presentations.</p>
+        </section>
+
+        <div class="generator-container">
+            <div class="input-section">
+                <h3 class="section-title">
+                    <i class="fas fa-cog"></i>
+                    Presentation Settings
+                </h3>
+                
+                <div class="form-group">
+                    <label for="presentationTitle">Presentation Title</label>
+                    <input type="text" id="presentationTitle" placeholder="Enter presentation title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="presentationTopic">Topic/Subject</label>
+                    <input type="text" id="presentationTopic" placeholder="Enter main topic">
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetAudience">Target Audience</label>
+                    <select id="targetAudience">
+                        <option value="general">General Audience</option>
+                        <option value="academic">Academic/Researchers</option>
+                        <option value="business">Business Professionals</option>
+                        <option value="students">Students</option>
+                        <option value="technical">Technical Audience</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="keyPoints">Key Points (one per line)</label>
+                    <textarea id="keyPoints" placeholder="Enter main points you want to cover"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Number of Slides</label>
+                    <div class="slides-control">
+                        <button class="slide-btn" id="decreaseSlides">-</button>
+                        <div class="slide-count" id="slideCount">10</div>
+                        <button class="slide-btn" id="increaseSlides">+</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Design Template</label>
+                    <div class="design-templates">
+                        <div class="template-option" data-template="professional">
+                            <div class="template-icon"><i class="fas fa-briefcase"></i></div>
+                            <div>Professional</div>
+                        </div>
+                        <div class="template-option" data-template="creative">
+                            <div class="template-icon"><i class="fas fa-palette"></i></div>
+                            <div>Creative</div>
+                        </div>
+                        <div class="template-option" data-template="minimal">
+                            <div class="template-icon"><i class="fas fa-minimize"></i></div>
+                            <div>Minimal</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="colorScheme">Color Scheme</label>
+                    <select id="colorScheme">
+                        <option value="blue">Blue Theme</option>
+                        <option value="green">Green Theme</option>
+                        <option value="purple">Purple Theme</option>
+                        <option value="dark">Dark Theme</option>
+                        <option value="warm">Warm Colors</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">
+                    <i class="fas fa-eye"></i>
+                    Presentation Preview
+                </h3>
+                
+                <div class="preview-area" id="previewArea">
+                    <i class="fas fa-presentation-screen" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+                    <h3>Preview Will Appear Here</h3>
+                    <p>Configure your presentation settings to see the preview</p>
+                    
+                    <div class="preview-slides" id="previewSlides">
+                        <!-- Slides will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="generate-btn" id="generateBtn">
+                <i class="fas fa-magic"></i> Generate Presentation
+            </button>
+            <button class="reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset Settings
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>TranscribeX</h3>
+                <p>AI-powered document transformation tools for academic and professional excellence.</p>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Features</h3>
+                <ul class="footer-links">
+                    <li><a href="ieee-converter.html">IEEE Paper Converter</a></li>
+                    <li><a href="ppt-generator.html">PPT Generator</a></li>
+                    <li><a href="mcq-generator.html">MCQ Generator</a></li>
+                    <li><a href="summary-creator.html">Summary Creator</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2023 TranscribeX. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Slide Count Control
+        const slideCount = document.getElementById('slideCount');
+        const decreaseSlides = document.getElementById('decreaseSlides');
+        const increaseSlides = document.getElementById('increaseSlides');
+        
+        let currentSlides = 10;
+        
+        decreaseSlides.addEventListener('click', () => {
+            if (currentSlides > 3) {
+                currentSlides--;
+                slideCount.textContent = currentSlides;
+                updatePreview();
+            }
+        });
+        
+        increaseSlides.addEventListener('click', () => {
+            if (currentSlides < 20) {
+                currentSlides++;
+                slideCount.textContent = currentSlides;
+                updatePreview();
+            }
+        });
+
+        // Template Selection
+        const templateOptions = document.querySelectorAll('.template-option');
+        let selectedTemplate = 'professional';
+        
+        templateOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                templateOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedTemplate = option.dataset.template;
+                updatePreview();
+            });
+        });
+
+        // Set default template
+        templateOptions[0].classList.add('selected');
+
+        // Form Elements
+        const presentationTitle = document.getElementById('presentationTitle');
+        const presentationTopic = document.getElementById('presentationTopic');
+        const keyPoints = document.getElementById('keyPoints');
+        const previewArea = document.getElementById('previewArea');
+        const previewSlides = document.getElementById('previewSlides');
+
+        // Update Preview
+        function updatePreview() {
+            const title = presentationTitle.value || 'Presentation Title';
+            const topic = presentationTopic.value || 'General Topic';
+            
+            if (title !== 'Presentation Title' || topic !== 'General Topic') {
+                previewArea.innerHTML = '';
+                previewArea.appendChild(previewSlides);
+                previewSlides.style.display = 'block';
+                
+                // Generate sample slides
+                previewSlides.innerHTML = `
+                    <div class="slide-preview">
+                        <div class="slide-title">Slide 1: ${title}</div>
+                        <div class="slide-content">Topic: ${topic}</div>
+                    </div>
+                    <div class="slide-preview">
+                        <div class="slide-title">Slide 2: Agenda</div>
+                        <div class="slide-content">Overview of presentation structure</div>
+                    </div>
+                    <div class="slide-preview">
+                        <div class="slide-title">Slide 3: Key Points</div>
+                        <div class="slide-content">Main discussion points will appear here</div>
+                    </div>
+                    <div class="slide-preview">
+                        <div class="slide-title">Slide ${currentSlides}: Conclusion</div>
+                        <div class="slide-content">Summary and key takeaways</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Add event listeners for real-time preview
+        presentationTitle.addEventListener('input', updatePreview);
+        presentationTopic.addEventListener('input', updatePreview);
+
+        // Action Buttons
+        const generateBtn = document.getElementById('generateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        generateBtn.addEventListener('click', () => {
+            if (!presentationTitle.value) {
+                alert('Please enter a presentation title');
+                return;
+            }
+            
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            generateBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Your presentation has been generated successfully!');
+                generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Presentation';
+                generateBtn.disabled = false;
+            }, 2000);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset all settings?')) {
+                document.querySelectorAll('input, textarea, select').forEach(element => {
+                    element.value = '';
+                });
+                currentSlides = 10;
+                slideCount.textContent = '10';
+                previewSlides.style.display = 'none';
+                previewArea.innerHTML = `
+                    <i class="fas fa-presentation-screen" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+                    <h3>Preview Will Appear Here</h3>
+                    <p>Configure your presentation settings to see the preview</p>
+                `;
+            }
+        });
+
+        // Logout functionality
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            if(confirm('Are you sure you want to logout?')) {
+                alert('Logging out...');
+            }
+        });
+
+        // User data
+        const userData = { name: "John Smith" };
+        document.querySelector('.user-profile span').textContent = userData.name;
+        document.querySelector('.avatar').textContent = userData.name.split(' ').map(n => n[0]).join('');
+    </script>
+</body>
+</html>
